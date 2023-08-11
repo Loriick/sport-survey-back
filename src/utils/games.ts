@@ -1,4 +1,7 @@
 import { Match } from 'src/types/leagues';
+import { URLSearchParams } from 'url';
+
+const BASE_API_URL = 'https://api-football-v1.p.rapidapi.com/v3';
 
 export function createMatch(array: unknown[]): Match[] {
   return array.map(({ fixture, league, teams }) => ({
@@ -28,4 +31,20 @@ export function createMatch(array: unknown[]): Match[] {
       },
     },
   }));
+}
+
+export async function callFootballAPI({
+  pathname,
+  params,
+}: {
+  pathname: string;
+  params?: URLSearchParams;
+}): Promise<Response | Response[]> {
+  const extra = params ? params : '';
+  return await fetch(`${BASE_API_URL}/${pathname}` + extra, {
+    headers: {
+      'X-RapidAPI-Key': process.env.RAPID_API_KEY,
+      'X-RapidAPI-Host': 'api-football-v1.p.rapidapi.com',
+    },
+  });
 }

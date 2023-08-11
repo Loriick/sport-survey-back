@@ -1,31 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { AllMatchPerSeason, League, Match } from 'src/types/leagues';
-import { createMatch } from 'src/utils/games';
-
-const countries = ['France', 'England', 'Italy', 'Spain', 'Germany'];
-const leagueList = [
-  'Ligue 1',
-  'Premier League',
-  'La Liga',
-  'Serie A',
-  'Bundesliga',
-];
-const today = new Date().toISOString().split('T')[0];
-const BASE_API_URL = 'https://api-football-v1.p.rapidapi.com/v3';
+import { countries, leagueList, today } from 'src/utils/constants';
+import { callFootballAPI, createMatch } from 'src/utils/games';
 
 @Injectable()
 export class LeaguesService {
   async getLeagues(): Promise<League[]> {
     try {
-      const response = await fetch(`${BASE_API_URL}/leagues`, {
-        headers: {
-          'X-RapidAPI-Key':
-            'fae0ca8846msh64a9e63faa98a6cp18ba15jsn059caa14bc8b',
-          'X-RapidAPI-Host': 'api-football-v1.p.rapidapi.com',
-        },
-      });
+      const response = await callFootballAPI({ pathname: 'leagues' });
 
-      const data = await response.json();
+      const data = await (response as Response).json();
 
       const countriesLeagues = data.response.filter((league) =>
         countries.includes(league.country?.name),
@@ -57,21 +41,14 @@ export class LeaguesService {
 
       const responses = await Promise.all(
         leaguesIds.map((id) =>
-          fetch(
-            `${BASE_API_URL}/fixtures?` +
-              new URLSearchParams({
-                date: today,
-                league: id.toString(),
-                season: new Date().getFullYear().toString(),
-              }),
-            {
-              headers: {
-                'X-RapidAPI-Key':
-                  'fae0ca8846msh64a9e63faa98a6cp18ba15jsn059caa14bc8b',
-                'X-RapidAPI-Host': 'api-football-v1.p.rapidapi.com',
-              },
-            },
-          ).then((data) => data.json()),
+          callFootballAPI({
+            pathname: 'fixtures?',
+            params: new URLSearchParams({
+              date: today,
+              league: id.toString(),
+              season: new Date().getFullYear().toString(),
+            }),
+          }).then((data) => (data as Response).json()),
         ),
       );
 
@@ -89,21 +66,14 @@ export class LeaguesService {
       throw new Error('Id of the league is not provided');
     }
     try {
-      const response = await fetch(
-        `${BASE_API_URL}/fixtures?` +
-          new URLSearchParams({
-            league: leagueId.toString(),
-            season: new Date().getFullYear().toString(),
-          }),
-        {
-          headers: {
-            'X-RapidAPI-Key':
-              'fae0ca8846msh64a9e63faa98a6cp18ba15jsn059caa14bc8b',
-            'X-RapidAPI-Host': 'api-football-v1.p.rapidapi.com',
-          },
-        },
-      );
-      const data = await response.json();
+      const response = await callFootballAPI({
+        pathname: 'fixtures?',
+        params: new URLSearchParams({
+          league: leagueId.toString(),
+          season: new Date().getFullYear().toString(),
+        }),
+      });
+      const data = await (response as Response).json();
 
       const matchList = createMatch(data.response);
 
