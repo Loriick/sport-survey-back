@@ -8,25 +8,19 @@ export interface League {
   flag: string;
 }
 
-interface Team {
+export interface Team {
   id: number;
   name: string;
   logo: string;
 }
 
-interface Stadium {
-  id: number;
-  city: string;
-  name: string;
-}
-
 export interface Match {
-  id: number;
-  date: Date | string;
+  apiId: number;
+  date: string;
   timestamp: number;
   referee: string;
   leagueId: number;
-  stadium: Stadium;
+  stadium: string;
   day: number;
   teams: {
     home: Team & {
@@ -36,6 +30,8 @@ export interface Match {
       winner: boolean | null;
     };
   };
+  // TODO: change this type
+  vote?: any;
 }
 
 export interface AllMatchPerSeason {

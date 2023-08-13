@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { LeaguesModule } from './leagues/leagues.modules';
+import { LeaguesModule } from './games/games.modules';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
-import { User } from './typeorm/entities/User';
+import { User, Match, Vote } from './typeorm/entities/';
 import { PassportModule } from '@nestjs/passport';
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import { PassportModule } from '@nestjs/passport';
         username: configService.get('PGUSER'),
         password: configService.get('PGPASSWORD'),
         database: configService.get('PGDATABASE'),
-        entities: [User],
+        entities: [User, Match, Vote],
         synchronize: true,
         ssl: true,
         extra: {

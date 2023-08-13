@@ -2,19 +2,20 @@ import { Match } from 'src/types/leagues';
 import { URLSearchParams } from 'url';
 import { BASE_API_URL } from './constants';
 
-export function createMatch(array: unknown[]): Match[] {
-  return array.map(({ fixture, league, teams }) => ({
-    id: fixture.id,
-    date: fixture.date,
+export function createMatchList(array: unknown[]): Match[] {
+  return array.map(createMatch);
+}
+
+export function createMatch({ fixture, league, teams }): Match {
+  return {
+    apiId: fixture.id,
+    date: fixture.date.split('T')[0],
     timestamp: fixture.timestamp,
     referee: fixture.referee,
     leagueId: league.id,
     day: +league.round.replace(/[A-Za-z$-]/g, ''),
-    stadium: {
-      id: fixture.venue.id,
-      name: fixture.venue.name,
-      city: fixture.venue.city,
-    },
+    stadium: `${fixture.venue.name} - ${fixture.venue.city}`,
+
     teams: {
       home: {
         id: teams.home.id,
@@ -29,7 +30,7 @@ export function createMatch(array: unknown[]): Match[] {
         winner: teams.away.winner,
       },
     },
-  }));
+  };
 }
 
 export async function callFootballAPI({

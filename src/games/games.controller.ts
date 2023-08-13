@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { LeaguesService } from './leagues.service';
+import { LeaguesService } from './games.service';
 import { AllMatchPerSeason, League, Match } from 'src/types/leagues';
 
 @Controller('/game')

@@ -1,10 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { AllMatchPerSeason, League, Match } from 'src/types/leagues';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Match } from 'src/typeorm/entities';
+import {
+  AllMatchPerSeason,
+  League,
+  Match as MatchType,
+} from 'src/types/leagues';
 import { countries, leagueList, today } from 'src/utils/constants';
-import { callFootballAPI, createMatch } from 'src/utils/games';
+import { callFootballAPI, createMatch, createMatchList } from 'src/utils/games';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class LeaguesService {
+  constructor(
+    @InjectRepository(Match)
+    private readonly matchRepository: Repository<Match>,
+  ) {}
   async getLeagues(): Promise<League[]> {
     try {
       const response = await callFootballAPI({ pathname: 'leagues' });
@@ -34,8 +45,14 @@ export class LeaguesService {
     }
   }
 
-  async getTodayMatch(): Promise<Match[]> {
+  async getTodayMatch(): Promise<MatchType[]> {
     try {
+      const matchOfTheDay = await this.matchRepository.findBy({
+        date: today,
+      });
+
+      if (matchOfTheDay.length > 0) return matchOfTheDay;
+
       const leagues = await this.getLeagues();
       const leaguesIds = leagues.map((league) => league.id);
 
@@ -52,10 +69,22 @@ export class LeaguesService {
         ),
       );
 
-      const matchOfTheDay: Match[] = responses.flatMap((match) => {
-        return createMatch(match.response);
+      const createdMatch = responses.flatMap((match) => {
+        return match.response.map(
+          async (game: {
+            fixture: unknown;
+            league: unknown;
+            teams: unknown;
+          }) => {
+            const newMatch = createMatch(game);
+            const newMatchCreated = this.matchRepository.create(newMatch);
+            this.matchRepository.save(newMatchCreated);
+            return newMatchCreated;
+          },
+        );
       });
-      return matchOfTheDay;
+
+      return createdMatch;
     } catch (error) {
       console.error(error);
     }
@@ -75,10 +104,10 @@ export class LeaguesService {
       });
       const data = await (response as Response).json();
 
-      const matchList = createMatch(data.response);
+      const matchList = createMatchList(data.response);
 
       const matchPerDay: AllMatchPerSeason = matchList.reduce(
-        (seasonObject, currentMatch: Match) => {
+        (seasonObject, currentMatch: MatchType) => {
           if (seasonObject[currentMatch.day]) {
             seasonObject[currentMatch.day].push(currentMatch);
             return seasonObject;

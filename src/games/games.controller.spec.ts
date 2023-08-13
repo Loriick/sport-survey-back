@@ -1,6 +1,8 @@
-import { LeaguesController } from './leagues.controller';
-import { LeaguesService } from './leagues.service';
+import { TestingModule, Test } from '@nestjs/testing';
+import { LeaguesController } from './games.controller';
+import { LeaguesService } from './games.service';
 import { AllMatchPerSeason, League, Match } from 'src/types/leagues';
+import { beforeEach } from 'node:test';
 
 const leagues: League[] = [
   {
@@ -16,17 +18,13 @@ const leagues: League[] = [
 
 const matches: Match[] = [
   {
-    id: 1044885,
-    date: '2023-08-11T19:00:00+00:00',
+    apiId: 1044885,
+    date: '2023-08-11',
     timestamp: 1691780400,
     referee: 'B. Bastien',
     leagueId: 61,
     day: 1,
-    stadium: {
-      id: 663,
-      name: 'Allianz Riviera',
-      city: 'Nice',
-    },
+    stadium: 'Allianz Riviera - Nice',
     teams: {
       home: {
         id: 84,
@@ -46,17 +44,13 @@ const matches: Match[] = [
 const matchPerSeason: AllMatchPerSeason = {
   1: [
     {
-      id: 1044885,
-      date: '2023-08-11T19:00:00+00:00',
+      apiId: 1044885,
+      date: '2023-08-11',
       timestamp: 1691780400,
       referee: 'B. Bastien',
       leagueId: 61,
       day: 1,
-      stadium: {
-        id: 663,
-        name: 'Allianz Riviera',
-        city: 'Nice',
-      },
+      stadium: 'Allianz Riviera - Nice',
       teams: {
         home: {
           id: 84,
@@ -79,12 +73,22 @@ describe('AppController', () => {
   let leaguesController: LeaguesController;
   let leaguesService: LeaguesService;
 
-  beforeEach(() => {
-    leaguesService = new LeaguesService();
-    leaguesController = new LeaguesController(leaguesService);
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [LeaguesService],
+      controllers: [LeaguesController],
+    }).compile();
+
+    leaguesService = module.get<LeaguesService>(LeaguesService);
+    leaguesController = module.get<LeaguesController>(LeaguesController);
   });
 
-  describe('root', () => {
+  describe('Games', () => {
+    it('controller and service should be defined', () => {
+      expect(leaguesController).toBeDefined();
+      expect(leaguesService).toBeDefined();
+    });
+
     it('should return Leagues', async () => {
       jest
         .spyOn(leaguesService, 'getLeagues')
