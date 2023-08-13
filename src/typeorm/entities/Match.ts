@@ -1,11 +1,5 @@
 import { Team } from 'src/types/leagues';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Vote } from './MatchVote';
 
 @Entity({ name: 'match' })
@@ -44,7 +38,6 @@ export class Match {
     };
   };
 
-  @OneToOne(() => Vote)
-  @JoinColumn()
-  vote: Vote;
+  @OneToMany(() => Vote, (vote) => vote.match)
+  vote: Vote[];
 }

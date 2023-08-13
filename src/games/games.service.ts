@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Match } from 'src/typeorm/entities';
+import { Match, Vote } from 'src/typeorm/entities';
 import {
   AllMatchPerSeason,
   League,
@@ -15,6 +15,7 @@ export class LeaguesService {
   constructor(
     @InjectRepository(Match)
     private readonly matchRepository: Repository<Match>,
+    @InjectRepository(Vote) private readonly voteRepository: Repository<Vote>,
   ) {}
   async getLeagues(): Promise<League[]> {
     try {
@@ -47,8 +48,14 @@ export class LeaguesService {
 
   async getTodayMatch(): Promise<MatchType[]> {
     try {
-      const matchOfTheDay = await this.matchRepository.findBy({
-        date: today,
+      const matchOfTheDay = await this.matchRepository.find({
+        relations: ['vote'],
+        where: {
+          date: today,
+        },
+        order: {
+          id: 'ASC',
+        },
       });
 
       if (matchOfTheDay.length > 0) return matchOfTheDay;
@@ -71,15 +78,11 @@ export class LeaguesService {
 
       const createdMatch = responses.flatMap((match) => {
         return match.response.map(
-          async (game: {
-            fixture: unknown;
-            league: unknown;
-            teams: unknown;
-          }) => {
+          (game: { fixture: unknown; league: unknown; teams: unknown }) => {
             const newMatch = createMatch(game);
             const newMatchCreated = this.matchRepository.create(newMatch);
-            this.matchRepository.save(newMatchCreated);
-            return newMatchCreated;
+
+            return this.matchRepository.save(newMatchCreated);
           },
         );
       });
@@ -122,5 +125,18 @@ export class LeaguesService {
     } catch (error) {
       throw new Error(error.message);
     }
+  }
+  async voteMatch(vote: Vote) {
+    const createdVote = this.voteRepository.create(vote);
+    await this.voteRepository.save(createdVote);
+
+    const match = await this.matchRepository.findOneBy({ id: vote.gameId });
+    match.vote && match.vote?.length > 1
+      ? match.vote.push(createdVote)
+      : (match.vote = [createdVote]);
+
+    await this.matchRepository.save(match);
+
+    return createdVote;
   }
 }

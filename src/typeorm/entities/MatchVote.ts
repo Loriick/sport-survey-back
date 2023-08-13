@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Match } from './Match';
 
 @Entity({ name: 'votes' })
 export class Vote {
@@ -6,14 +7,21 @@ export class Vote {
   id: number;
 
   @Column()
-  matchId: number;
-
-  @Column()
   userId: number;
 
   @Column()
   voteCount: number;
 
+  @Column('simple-json')
+  votes: {
+    away: number | null;
+    home: number | null;
+    draw: number | null;
+  };
+
   @Column()
-  vote: string;
+  gameId: number;
+
+  @ManyToOne(() => Match, (match) => match.vote, { onDelete: 'SET NULL' })
+  match: Match;
 }
