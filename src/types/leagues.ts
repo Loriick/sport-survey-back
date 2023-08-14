@@ -37,3 +37,21 @@ export interface Match {
 export interface AllMatchPerSeason {
   [k: number]: Match[];
 }
+
+export interface Vote {
+  id: number;
+
+  userId: number;
+
+  voteCount: number;
+
+  votes: {
+    away: number | null;
+    home: number | null;
+    draw: number | null;
+  };
+
+  gameId: number;
+
+  match: Match;
+}

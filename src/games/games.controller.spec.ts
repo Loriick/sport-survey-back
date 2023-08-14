@@ -1,8 +1,7 @@
 import { TestingModule, Test } from '@nestjs/testing';
 import { LeaguesController } from './games.controller';
 import { LeaguesService } from './games.service';
-import { AllMatchPerSeason, League, Match } from 'src/types/leagues';
-import { beforeEach } from 'node:test';
+import { AllMatchPerSeason, League, Match } from '../../src/types/leagues';
 
 const leagues: League[] = [
   {
@@ -70,8 +69,8 @@ const matchPerSeason: AllMatchPerSeason = {
 };
 
 describe('AppController', () => {
-  let leaguesController: LeaguesController;
-  let leaguesService: LeaguesService;
+  let leaguesController;
+  let leaguesService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -111,6 +110,6 @@ describe('AppController', () => {
       .spyOn(leaguesService, 'getAllMatch')
       .mockImplementation(async () => matchPerSeason);
 
-    expect(await leaguesController.getAllMatch(61)).toEqual(matches);
+    expect(await leaguesController.getAllMatch(61)).toEqual(matchPerSeason);
   });
 });

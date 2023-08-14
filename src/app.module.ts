@@ -4,8 +4,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LeaguesModule } from './games/games.modules';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
-import { User, Match, Vote } from './typeorm/entities/';
+import { User, Match, Vote, Feedback } from './typeorm/entities/';
 import { PassportModule } from '@nestjs/passport';
+import { FeedbackModule } from './feedback/feedback.module';
 @Module({
   imports: [
     LeaguesModule,
@@ -22,7 +23,7 @@ import { PassportModule } from '@nestjs/passport';
         username: configService.get('PGUSER'),
         password: configService.get('PGPASSWORD'),
         database: configService.get('PGDATABASE'),
-        entities: [User, Match, Vote],
+        entities: [User, Match, Vote, Feedback],
         synchronize: true,
         ssl: true,
         extra: {
@@ -34,6 +35,7 @@ import { PassportModule } from '@nestjs/passport';
     }),
     PassportModule.register({ session: true }),
     AuthModule,
+    FeedbackModule,
   ],
 })
 export class AppModule {}

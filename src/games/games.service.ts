@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Match, Vote } from 'src/typeorm/entities';
+import { Match, Vote } from '../typeorm/entities';
 import {
   AllMatchPerSeason,
   League,
   Match as MatchType,
+  Vote as VoteType,
 } from 'src/types/leagues';
-import { countries, leagueList, today } from 'src/utils/constants';
-import { callFootballAPI, createMatch, createMatchList } from 'src/utils/games';
+import { countries, leagueList, today } from '../utils/constants';
+import { callFootballAPI, createMatch, createMatchList } from '../utils/games';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -126,7 +127,7 @@ export class LeaguesService {
       throw new Error(error.message);
     }
   }
-  async voteMatch(vote: Vote) {
+  async voteMatch(vote: VoteType) {
     const createdVote = this.voteRepository.create(vote);
     await this.voteRepository.save(createdVote);
 
