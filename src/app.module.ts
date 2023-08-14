@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { User, Match, Vote, Feedback } from './typeorm/entities/';
 import { PassportModule } from '@nestjs/passport';
 import { FeedbackModule } from './feedback/feedback.module';
+import { UserModule } from './user/user.module';
 @Module({
   imports: [
     LeaguesModule,
@@ -36,6 +37,7 @@ import { FeedbackModule } from './feedback/feedback.module';
     PassportModule.register({ session: true }),
     AuthModule,
     FeedbackModule,
+    UserModule,
   ],
 })
 export class AppModule {}

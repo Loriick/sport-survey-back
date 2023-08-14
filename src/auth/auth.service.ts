@@ -23,4 +23,18 @@ export class AuthService {
 
     return user;
   }
+
+  async updateUser({ data, id }: { data: Partial<UserType>; id: number }) {
+    try {
+      const user = await this.userRepository.findOneBy({ id });
+      const updatedUser = {
+        ...user,
+        ...data,
+      };
+
+      return await this.userRepository.save(updatedUser);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
