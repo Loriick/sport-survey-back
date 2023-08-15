@@ -10,4 +10,7 @@ export class Feedback {
 
   @Column()
   feedback: string;
+
+  @Column({ nullable: true })
+  email: string;
 }
