@@ -7,9 +7,10 @@ import {
   Match as MatchType,
   Vote as VoteType,
 } from 'src/types/leagues';
-import { countries, leagueList, today } from '../utils/constants';
+import { countries, errorMessage, leagueList, today } from '../utils/constants';
 import { callFootballAPI, createMatch, createMatchList } from '../utils/games';
 import { Repository } from 'typeorm';
+import { ErrorReturnType } from 'src/types/error';
 
 @Injectable()
 export class LeaguesService {
@@ -18,7 +19,7 @@ export class LeaguesService {
     private readonly matchRepository: Repository<Match>,
     @InjectRepository(Vote) private readonly voteRepository: Repository<Vote>,
   ) {}
-  async getLeagues(): Promise<League[]> {
+  async getLeagues(): Promise<League[] | ErrorReturnType> {
     try {
       const response = await callFootballAPI({ pathname: 'leagues' });
 
@@ -43,11 +44,13 @@ export class LeaguesService {
 
       return leagues;
     } catch (error) {
-      console.error(error);
+      return {
+        message: errorMessage,
+      };
     }
   }
 
-  async getTodayMatch(): Promise<MatchType[]> {
+  async getTodayMatch(): Promise<MatchType[] | ErrorReturnType> {
     try {
       const matchOfTheDay = await this.matchRepository.find({
         relations: ['vote'],
@@ -62,7 +65,7 @@ export class LeaguesService {
       if (matchOfTheDay.length > 0) return matchOfTheDay;
 
       const leagues = await this.getLeagues();
-      const leaguesIds = leagues.map((league) => league.id);
+      const leaguesIds = (leagues as League[]).map((league) => league.id);
 
       const responses = await Promise.all(
         leaguesIds.map((id) =>
@@ -90,7 +93,9 @@ export class LeaguesService {
 
       return createdMatch;
     } catch (error) {
-      console.error(error);
+      return {
+        message: errorMessage,
+      };
     }
   }
 
@@ -128,16 +133,22 @@ export class LeaguesService {
     }
   }
   async voteMatch(vote: VoteType) {
-    const createdVote = this.voteRepository.create(vote);
-    await this.voteRepository.save(createdVote);
+    try {
+      const createdVote = this.voteRepository.create(vote);
+      await this.voteRepository.save(createdVote);
 
-    const match = await this.matchRepository.findOneBy({ id: vote.gameId });
-    match.vote && match.vote?.length > 1
-      ? match.vote.push(createdVote)
-      : (match.vote = [createdVote]);
+      const match = await this.matchRepository.findOneBy({ id: vote.gameId });
+      match.vote && match.vote?.length > 1
+        ? match.vote.push(createdVote)
+        : (match.vote = [createdVote]);
 
-    await this.matchRepository.save(match);
+      await this.matchRepository.save(match);
 
-    return createdVote;
+      return createdVote;
+    } catch (error) {
+      return {
+        message: errorMessage,
+      };
+    }
   }
 }

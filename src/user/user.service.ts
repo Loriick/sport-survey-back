@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/typeorm/entities/User';
 import { User as UserType } from 'src/types/user';
+import { errorMessage } from 'src/utils/constants';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -18,20 +19,23 @@ export class UserService {
       const newUser = this.userRepository.create(details);
       return this.userRepository.save(newUser);
     } catch (error) {
-      console.log('error', error);
+      return {
+        message: "Oups quelque chose s'est mal passé. veuillez réessayer",
+      };
     }
   }
 
   async findUser(id: number) {
     try {
-      console.log(id);
       const user = await this.userRepository.findOneBy({
         id,
       });
 
       return user;
     } catch (error) {
-      console.error(error);
+      return {
+        message: errorMessage,
+      };
     }
   }
 
@@ -45,7 +49,9 @@ export class UserService {
 
       return await this.userRepository.save(updatedUser);
     } catch (error) {
-      console.log(error);
+      return {
+        message: errorMessage,
+      };
     }
   }
 }

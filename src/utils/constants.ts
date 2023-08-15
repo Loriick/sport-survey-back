@@ -20,3 +20,6 @@ export const leagueList = [
 export const today = new Date().toISOString().split('T')[0];
 export const USER_SERVICE = 'USER_SERVICE';
 export const BASE_API_URL = 'https://api-football-v1.p.rapidapi.com/v3';
+
+export const errorMessage =
+  "Il semblerait qu'il y ait un problème. \n Veuillez essayait de rafraichir la page où envoyez-nous un message via les avis.";
