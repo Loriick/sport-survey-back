@@ -16,4 +16,10 @@ export class User {
 
   @Column()
   username: string;
+
+  @Column()
+  provider: string;
+
+  @Column()
+  providerId: string;
 }

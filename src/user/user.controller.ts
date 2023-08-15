@@ -1,10 +1,10 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
-import { AuthService } from 'src/auth/auth.service';
 import { User } from 'src/types/user';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: AuthService) {}
+  constructor(private readonly userService: UserService) {}
 
   @Post('update/:id')
   async updateUser(
