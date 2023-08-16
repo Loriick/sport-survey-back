@@ -61,7 +61,7 @@ export class LeaguesService {
           id: 'ASC',
         },
       });
-
+      console.log(today);
       if (matchOfTheDay.length > 0) return matchOfTheDay;
 
       const leagues = await this.getLeagues();
@@ -80,16 +80,27 @@ export class LeaguesService {
         ),
       );
 
-      const createdMatch = responses.flatMap((match) => {
-        return match.response.map(
-          (game: { fixture: unknown; league: unknown; teams: unknown }) => {
-            const newMatch = createMatch(game);
-            const newMatchCreated = this.matchRepository.create(newMatch);
+      const createdMatch: Match[] = [];
 
-            return this.matchRepository.save(newMatchCreated);
-          },
-        );
-      });
+      for (const match of responses) {
+        for (const game of match.response) {
+          const newMatch = createMatch(game);
+          const newMatchCreated = this.matchRepository.create(newMatch);
+          const savedMatch = await this.matchRepository.save(newMatchCreated);
+          createdMatch.push(savedMatch);
+        }
+      }
+
+      // const createdMatch = responses.flatMap((match) => {
+      //   return match.response.map(
+      //     (game: { fixture: unknown; league: unknown; teams: unknown }) => {
+      //       const newMatch = createMatch(game);
+      //       const newMatchCreated = this.matchRepository.create(newMatch);
+
+      //       return this.matchRepository.save(newMatchCreated);
+      //     },
+      //   );
+      // });
 
       return createdMatch;
     } catch (error) {
