@@ -11,6 +11,7 @@ import { countries, errorMessage, leagueList, today } from '../utils/constants';
 import { callFootballAPI, createMatch, createMatchList } from '../utils/games';
 import { Repository } from 'typeorm';
 import { ErrorReturnType } from 'src/types/error';
+import { Like } from 'typeorm';
 
 @Injectable()
 export class LeaguesService {
@@ -50,18 +51,21 @@ export class LeaguesService {
     }
   }
 
-  async getTodayMatch(): Promise<MatchType[] | ErrorReturnType> {
+  async getTodayMatch({
+    date,
+    leagueId,
+  }): Promise<MatchType[] | ErrorReturnType> {
     try {
       const matchOfTheDay = await this.matchRepository.find({
         relations: ['vote'],
         where: {
-          date: today,
+          date: Like(`%${date}%`),
+          apiId: leagueId ? leagueId : undefined,
         },
         order: {
-          id: 'ASC',
+          timestamp: 'ASC',
         },
       });
-      console.log(today);
       if (matchOfTheDay.length > 0) return matchOfTheDay;
 
       const leagues = await this.getLeagues();
@@ -91,19 +95,9 @@ export class LeaguesService {
         }
       }
 
-      // const createdMatch = responses.flatMap((match) => {
-      //   return match.response.map(
-      //     (game: { fixture: unknown; league: unknown; teams: unknown }) => {
-      //       const newMatch = createMatch(game);
-      //       const newMatchCreated = this.matchRepository.create(newMatch);
-
-      //       return this.matchRepository.save(newMatchCreated);
-      //     },
-      //   );
-      // });
-
       return createdMatch;
     } catch (error) {
+      console.log(error);
       return {
         message: errorMessage,
       };

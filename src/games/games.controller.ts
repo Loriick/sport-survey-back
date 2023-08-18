@@ -19,10 +19,12 @@ export class LeaguesController {
     return await this.leaguesService.getLeagues();
   }
 
-  @Get('of-the-day')
-  @UseGuards(JwtAuthGuard)
-  async getTodayMatch(): Promise<Match[] | ErrorReturnType> {
-    return await this.leaguesService.getTodayMatch();
+  @Get('of-the-day/:date/:leagueId?')
+  async getTodayMatch(
+    @Param('date') date: string,
+    @Param('leagueId') leagueId?: number,
+  ): Promise<Match[] | ErrorReturnType> {
+    return await this.leaguesService.getTodayMatch({ date, leagueId });
   }
 
   @Get('all/:leagueId')

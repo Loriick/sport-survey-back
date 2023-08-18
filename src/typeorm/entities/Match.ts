@@ -16,7 +16,7 @@ export class Match {
   @Column('int')
   timestamp: number;
 
-  @Column()
+  @Column({ nullable: true })
   referee: string;
 
   @Column('int')

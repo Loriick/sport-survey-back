@@ -9,7 +9,7 @@ export function createMatchList(array: unknown[]): Match[] {
 export function createMatch({ fixture, league, teams }): Match {
   return {
     apiId: fixture.id,
-    date: fixture.date.split('T')[0],
+    date: fixture.date,
     timestamp: fixture.timestamp,
     referee: fixture.referee,
     leagueId: league.id,
