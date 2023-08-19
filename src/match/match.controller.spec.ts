@@ -1,6 +1,6 @@
 import { TestingModule, Test } from '@nestjs/testing';
-import { LeaguesController } from './games.controller';
-import { LeaguesService } from './games.service';
+import { MatchController } from './match.controller';
+import { MatchService } from './match.service';
 import { AllMatchPerSeason, League, Match } from '../../src/types/leagues';
 
 const leagues: League[] = [
@@ -69,47 +69,47 @@ const matchPerSeason: AllMatchPerSeason = {
 };
 
 describe('AppController', () => {
-  let leaguesController;
-  let leaguesService;
+  let matchController;
+  let matchService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [LeaguesService],
-      controllers: [LeaguesController],
+      providers: [MatchService],
+      controllers: [MatchController],
     }).compile();
 
-    leaguesService = module.get<LeaguesService>(LeaguesService);
-    leaguesController = module.get<LeaguesController>(LeaguesController);
+    matchService = module.get<MatchService>(MatchService);
+    matchController = module.get<MatchController>(MatchController);
   });
 
   describe('Games', () => {
     it('controller and service should be defined', () => {
-      expect(leaguesController).toBeDefined();
-      expect(leaguesService).toBeDefined();
+      expect(matchController).toBeDefined();
+      expect(matchService).toBeDefined();
     });
 
     it('should return Leagues', async () => {
       jest
-        .spyOn(leaguesService, 'getLeagues')
+        .spyOn(matchService, 'getLeagues')
         .mockImplementation(async () => leagues);
 
-      expect(await leaguesController.getLeagues()).toEqual(leagues);
+      expect(await matchService.getLeagues()).toEqual(leagues);
     });
   });
 
   it('should return All games of the day', async () => {
     jest
-      .spyOn(leaguesService, 'getTodayMatch')
+      .spyOn(matchService, 'getTodayMatch')
       .mockImplementation(async () => matches);
 
-    expect(await leaguesController.getTodayMatch()).toEqual(matches);
+    expect(await matchController.getTodayMatch()).toEqual(matches);
   });
 
   it('should return All games for the current season', async () => {
     jest
-      .spyOn(leaguesService, 'getAllMatch')
+      .spyOn(matchService, 'getAllMatch')
       .mockImplementation(async () => matchPerSeason);
 
-    expect(await leaguesController.getAllMatch(61)).toEqual(matchPerSeason);
+    expect(await matchController.getAllMatch(61)).toEqual(matchPerSeason);
   });
 });

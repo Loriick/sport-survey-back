@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { LeaguesService } from './games.service';
+import { MatchService } from './match.service';
 import {
   AllMatchPerSeason,
   League,
@@ -10,13 +10,13 @@ import { Vote } from '../typeorm/entities/MatchVote';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.gard';
 import { ErrorReturnType } from 'src/types/error';
 
-@Controller('game')
-export class LeaguesController {
-  constructor(private readonly leaguesService: LeaguesService) {}
+@Controller('match')
+export class MatchController {
+  constructor(private readonly matchService: MatchService) {}
 
   @Get('leagues')
   async getLeagues(): Promise<League[] | ErrorReturnType> {
-    return await this.leaguesService.getLeagues();
+    return await this.matchService.getLeagues();
   }
 
   @Get('of-the-day/:date/:leagueId?')
@@ -24,19 +24,19 @@ export class LeaguesController {
     @Param('date') date: string,
     @Param('leagueId') leagueId?: number,
   ): Promise<Match[] | ErrorReturnType> {
-    return await this.leaguesService.getTodayMatch({ date, leagueId });
+    return await this.matchService.getTodayMatch({ date, leagueId });
   }
 
   @Get('all/:leagueId')
   async getAllMatch(
     @Param('leagueId') leagueId: number,
   ): Promise<AllMatchPerSeason | ErrorReturnType> {
-    return await this.leaguesService.getAllMatch(leagueId);
+    return await this.matchService.getAllMatch(leagueId);
   }
 
   @Post('vote')
   @UseGuards(JwtAuthGuard)
   async voteMatch(@Body() vote: Vote): Promise<VoteType | ErrorReturnType> {
-    return await this.leaguesService.voteMatch(vote);
+    return await this.matchService.voteMatch(vote);
   }
 }
