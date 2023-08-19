@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { LeaguesModule } from './games/games.modules';
+import { MatchModule } from './match/match.modules';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { User, Match, Vote, Feedback } from './typeorm/entities/';
@@ -9,7 +9,7 @@ import { FeedbackModule } from './feedback/feedback.module';
 import { UserModule } from './user/user.module';
 @Module({
   imports: [
-    LeaguesModule,
+    MatchModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

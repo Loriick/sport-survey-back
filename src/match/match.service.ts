@@ -7,14 +7,20 @@ import {
   Match as MatchType,
   Vote as VoteType,
 } from 'src/types/leagues';
-import { countries, errorMessage, leagueList, today } from '../utils/constants';
-import { callFootballAPI, createMatch, createMatchList } from '../utils/games';
+import {
+  BASE_API_URL,
+  countries,
+  errorMessage,
+  leagueList,
+  today,
+} from '../utils/constants';
+import { createMatch, createMatchList } from '../utils/games';
 import { Repository } from 'typeorm';
 import { ErrorReturnType } from 'src/types/error';
 import { Like } from 'typeorm';
 
 @Injectable()
-export class LeaguesService {
+export class MatchService {
   constructor(
     @InjectRepository(Match)
     private readonly matchRepository: Repository<Match>,
@@ -22,7 +28,7 @@ export class LeaguesService {
   ) {}
   async getLeagues(): Promise<League[] | ErrorReturnType> {
     try {
-      const response = await callFootballAPI({ pathname: 'leagues' });
+      const response = await this.callFootballAPI({ pathname: 'leagues' });
 
       const data = await (response as Response).json();
 
@@ -73,7 +79,7 @@ export class LeaguesService {
 
       const responses = await Promise.all(
         leaguesIds.map((id) =>
-          callFootballAPI({
+          this.callFootballAPI({
             pathname: 'fixtures?',
             params: new URLSearchParams({
               date: today,
@@ -109,7 +115,7 @@ export class LeaguesService {
       throw new Error('Id of the league is not provided');
     }
     try {
-      const response = await callFootballAPI({
+      const response = await this.callFootballAPI({
         pathname: 'fixtures?',
         params: new URLSearchParams({
           league: leagueId.toString(),
@@ -155,5 +161,21 @@ export class LeaguesService {
         message: errorMessage,
       };
     }
+  }
+
+  private async callFootballAPI({
+    pathname,
+    params,
+  }: {
+    pathname: string;
+    params?: URLSearchParams;
+  }): Promise<Response | Response[]> {
+    const extra = params ? params : '';
+    return await fetch(`${BASE_API_URL}/${pathname}` + extra, {
+      headers: {
+        'X-RapidAPI-Key': process.env.RAPID_API_KEY,
+        'X-RapidAPI-Host': 'api-football-v1.p.rapidapi.com',
+      },
+    });
   }
 }
