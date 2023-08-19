@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Feedback as FeedbackType } from 'src/types/feedback';
 import { ErrorReturnType } from 'src/types/error';
 import { Client } from '@notionhq/client';
+import { CreateFeedbackDto } from './dto/create-feedback.dto';
 
 @Injectable()
 export class FeedbackService {
@@ -18,14 +19,16 @@ export class FeedbackService {
     });
   }
 
-  async postFeedback(feedback: FeedbackType): Promise<{ message: string }> {
+  async postFeedback(
+    createFeedbackDto: CreateFeedbackDto,
+  ): Promise<{ message: string }> {
     try {
-      const createdFeedback = this.feedbackRepository.create(feedback);
+      const createdFeedback = this.feedbackRepository.create(createFeedbackDto);
 
       await this.feedbackRepository.save(createdFeedback);
 
       await this.addFeedback({
-        ...feedback,
+        ...createFeedbackDto,
       });
 
       return {

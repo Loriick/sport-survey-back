@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { User, Match, Vote, Feedback } from './typeorm/entities/';
 import { FeedbackModule } from './feedback/feedback.module';
 import { UserModule } from './user/user.module';
+import { TeamModule } from './team/team.module';
 @Module({
   imports: [
     MatchModule,
@@ -36,6 +37,7 @@ import { UserModule } from './user/user.module';
     AuthModule,
     FeedbackModule,
     UserModule,
+    TeamModule,
   ],
 })
 export class AppModule {}
