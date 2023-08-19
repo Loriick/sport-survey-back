@@ -6,7 +6,7 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
-  app.use(new ValidationPipe());
+  // app.use(new ValidationPipe());
   app.use(cookieParser());
   await app.listen(3001);
 }

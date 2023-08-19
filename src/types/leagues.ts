@@ -9,7 +9,7 @@ export interface League {
 }
 
 export interface Team {
-  id: number;
+  providerId: number;
   name: string;
   logo: string;
 }
@@ -22,14 +22,9 @@ export interface Match {
   leagueId: number;
   stadium: string;
   day: number;
-  teams: {
-    home: Team & {
-      winner: boolean | null;
-    };
-    away: Team & {
-      winner: boolean | null;
-    };
-  };
+  homeTeam?: Team;
+  awayTeam?: Team;
+
   // TODO: change this type
   vote?: any;
 }
