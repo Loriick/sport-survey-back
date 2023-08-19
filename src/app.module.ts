@@ -4,9 +4,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MatchModule } from './match/match.modules';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
-import { User, Match, Vote, Feedback } from './typeorm/entities/';
+import { User, Match, Vote, Feedback, Team } from './typeorm/entities/';
 import { FeedbackModule } from './feedback/feedback.module';
 import { UserModule } from './user/user.module';
+import { TeamModule } from './team/team.module';
 @Module({
   imports: [
     MatchModule,
@@ -23,7 +24,7 @@ import { UserModule } from './user/user.module';
         username: configService.get('PGUSER'),
         password: configService.get('PGPASSWORD'),
         database: configService.get('PGDATABASE'),
-        entities: [User, Match, Vote, Feedback],
+        entities: [User, Match, Vote, Feedback, Team],
         synchronize: true,
         ssl: true,
         extra: {
@@ -36,6 +37,7 @@ import { UserModule } from './user/user.module';
     AuthModule,
     FeedbackModule,
     UserModule,
+    TeamModule,
   ],
 })
 export class AppModule {}

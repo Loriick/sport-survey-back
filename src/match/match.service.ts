@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Match, Vote } from '../typeorm/entities';
 import {
@@ -14,10 +14,11 @@ import {
   leagueList,
   today,
 } from '../utils/constants';
-import { createMatch, createMatchList } from '../utils/games';
 import { Repository } from 'typeorm';
 import { ErrorReturnType } from 'src/types/error';
 import { Like } from 'typeorm';
+import { CreateTeamDto } from 'src/team/dto/create-team.dto';
+import { Team } from 'src/typeorm/entities/Team';
 
 @Injectable()
 export class MatchService {
@@ -25,6 +26,7 @@ export class MatchService {
     @InjectRepository(Match)
     private readonly matchRepository: Repository<Match>,
     @InjectRepository(Vote) private readonly voteRepository: Repository<Vote>,
+    @InjectRepository(Team) private readonly teamRepository: Repository<Team>,
   ) {}
   async getLeagues(): Promise<League[] | ErrorReturnType> {
     try {
@@ -49,6 +51,10 @@ export class MatchService {
         flag: country.flag,
       }));
 
+      if (!leagues) {
+        throw new NotFoundException();
+      }
+
       return leagues;
     } catch (error) {
       return {
@@ -57,10 +63,7 @@ export class MatchService {
     }
   }
 
-  async getTodayMatch({
-    date,
-    leagueId,
-  }): Promise<MatchType[] | ErrorReturnType> {
+  async getTodayMatch({ date, leagueId }): Promise<any[] | ErrorReturnType> {
     try {
       const matchOfTheDay = await this.matchRepository.find({
         relations: ['vote'],
@@ -94,7 +97,22 @@ export class MatchService {
 
       for (const match of responses) {
         for (const game of match.response) {
-          const newMatch = createMatch(game);
+          const { home, away } = game.teams;
+          const homeTeam = await this.createTeam({
+            providerId: home.id,
+            name: home.name,
+            logo: home.logo,
+          });
+
+          const awayTeam = await this.createTeam({
+            providerId: away.id,
+            name: away.name,
+            logo: away.logo,
+          });
+
+          const newMatch = this.createMatch(game);
+          newMatch.homeTeam = homeTeam;
+          newMatch.awayTeam = awayTeam;
           const newMatchCreated = this.matchRepository.create(newMatch);
           const savedMatch = await this.matchRepository.save(newMatchCreated);
           createdMatch.push(savedMatch);
@@ -124,7 +142,7 @@ export class MatchService {
       });
       const data = await (response as Response).json();
 
-      const matchList = createMatchList(data.response);
+      const matchList = this.createMatchList(data.response);
 
       const matchPerDay: AllMatchPerSeason = matchList.reduce(
         (seasonObject, currentMatch: MatchType) => {
@@ -177,5 +195,44 @@ export class MatchService {
         'X-RapidAPI-Host': 'api-football-v1.p.rapidapi.com',
       },
     });
+  }
+
+  private createMatchList(array: unknown[]): MatchType[] {
+    return array.map(this.createMatch);
+  }
+
+  private createMatch({ fixture, league }): MatchType {
+    return {
+      apiId: fixture.id,
+      date: fixture.date,
+      timestamp: fixture.timestamp,
+      referee: fixture.referee,
+      leagueId: league.id,
+      day: +league.round.replace(/[A-Za-z$-]/g, ''),
+      stadium: `${fixture.venue.name} - ${fixture.venue.city}`,
+    };
+  }
+
+  private createTeam(createTeamdto: CreateTeamDto) {
+    try {
+      const createdTeam = this.teamRepository.create(createTeamdto);
+      return this.teamRepository.save(createdTeam);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  private async findTeam(providerId: number) {
+    try {
+      const team = await this.teamRepository.findBy({
+        providerId,
+      });
+      if (!team) {
+        throw new NotFoundException();
+      }
+      return team;
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

@@ -1,6 +1,13 @@
-import { Team } from 'src/types/leagues';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Vote } from './MatchVote';
+import { Team } from './Team';
 
 @Entity({ name: 'match' })
 export class Match {
@@ -28,16 +35,14 @@ export class Match {
   @Column('int')
   day: number;
 
-  @Column('json')
-  teams: {
-    home: Team & {
-      winner: boolean | null;
-    };
-    away: Team & {
-      winner: boolean | null;
-    };
-  };
-
   @OneToMany(() => Vote, (vote) => vote.match)
   vote: Vote[];
+
+  @OneToOne(() => Team)
+  @JoinColumn()
+  homeTeam: Team;
+
+  @OneToOne(() => Team)
+  @JoinColumn()
+  awayTeam: Team;
 }
