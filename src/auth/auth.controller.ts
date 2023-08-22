@@ -1,5 +1,5 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
-import { GoogleAuthGards } from './utils/gards';
+import { GoogleAuthGards } from './utils/Gards';
 import { Request, Response } from 'express';
 import { JwtAuthService } from './jwt/jwt.service';
 import { User } from 'src/types/user';

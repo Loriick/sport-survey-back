@@ -1,0 +1,14 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        'europe-west9-docker.pkg.dev/foot-survey/foot-poll/production',
+        '-f',
+        'Dockerfile',
+        '.',
+      ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      ['push', 'europe-west9-docker.pkg.dev/foot-survey/foot-poll/production']

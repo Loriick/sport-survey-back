@@ -1,0 +1,11 @@
+services:
+  foot_poll:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: development
+    command: pnpm run start:dev foot_poll
+    ports:
+      - '3001:3001'
+    volumes:
+      - .:/usr/src/app
