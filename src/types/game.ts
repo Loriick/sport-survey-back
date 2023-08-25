@@ -15,11 +15,13 @@ export interface Team {
 }
 
 export interface Match {
+  id?: number;
   apiId: number;
   date: string;
   timestamp: number;
   referee: string;
   leagueId: number;
+  leagueName: string;
   stadium: string;
   day: number;
   homeTeam?: Team;
