@@ -5,7 +5,7 @@ import {
   AllMatchPerSeason,
   League,
   MatchReturnType,
-} from '../../src/types/leagues';
+} from '../../src/types/game';
 import { Match, Team, Vote } from '../typeorm/entities';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtAuthService } from '../auth/jwt/jwt.service';
@@ -30,6 +30,7 @@ const matches: MatchReturnType[] = [
     timestamp: 1691780400,
     referee: 'B. Bastien',
     leagueId: 61,
+    leagueName: 'Ligue 1',
     day: 1,
     stadium: 'Allianz Riviera - Nice',
     teams: {
@@ -55,6 +56,7 @@ const matchPerSeason: AllMatchPerSeason = {
       timestamp: 1691780400,
       referee: 'B. Bastien',
       leagueId: 61,
+      leagueName: 'Ligue 1',
       day: 1,
       stadium: 'Allianz Riviera - Nice',
       teams: {

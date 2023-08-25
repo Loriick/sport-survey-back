@@ -5,7 +5,7 @@ import {
   League,
   Match,
   Vote as VoteType,
-} from '../types/leagues';
+} from '../types/game';
 import { Vote } from '../typeorm/entities/MatchVote';
 import { JwtAuthGuard } from '../auth/jwt/jwt.gard';
 import { ErrorReturnType } from '../types/error';

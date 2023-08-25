@@ -30,6 +30,9 @@ export class Match {
   leagueId: number;
 
   @Column()
+  leagueName: string;
+
+  @Column()
   stadium: string;
 
   @Column('int')

@@ -7,7 +7,7 @@ import {
   MatchReturnType,
   Match as MatchType,
   Vote as VoteType,
-} from 'src/types/leagues';
+} from 'src/types/game';
 import {
   BASE_API_URL,
   countries,
@@ -213,6 +213,7 @@ export class MatchService {
       timestamp: fixture.timestamp,
       referee: fixture.referee,
       leagueId: league.id,
+      leagueName: league.name,
       day: +league.round.replace(/[A-Za-z$-]/g, ''),
       stadium: `${fixture.venue.name} - ${fixture.venue.city}`,
     };
