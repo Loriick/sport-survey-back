@@ -4,6 +4,7 @@ import { Match, Vote } from '../typeorm/entities';
 import {
   AllMatchPerSeason,
   League,
+  MatchReturnType,
   Match as MatchType,
   Vote as VoteType,
 } from 'src/types/leagues';
@@ -17,8 +18,8 @@ import {
 import { Repository } from 'typeorm';
 import { ErrorReturnType } from 'src/types/error';
 import { Like } from 'typeorm';
-import { CreateTeamDto } from 'src/team/dto/create-team.dto';
-import { Team } from 'src/typeorm/entities/Team';
+import { CreateTeamDto } from '../team/dto/create-team.dto';
+import { Team } from '../typeorm/entities/Team';
 
 @Injectable()
 export class MatchService {
@@ -63,7 +64,10 @@ export class MatchService {
     }
   }
 
-  async getTodayMatch({ date, leagueId }): Promise<any[] | ErrorReturnType> {
+  async getTodayMatch({
+    date,
+    leagueId,
+  }): Promise<MatchReturnType[] | ErrorReturnType> {
     try {
       const matchOfTheDay = await this.matchRepository.find({
         relations: ['vote'],
@@ -75,7 +79,8 @@ export class MatchService {
           timestamp: 'ASC',
         },
       });
-      if (matchOfTheDay.length > 0) return matchOfTheDay;
+      if (matchOfTheDay.length > 0)
+        return matchOfTheDay.map((match) => this.makeMatchApiResponse(match));
 
       const leagues = await this.getLeagues();
       const leaguesIds = (leagues as League[]).map((league) => league.id);
@@ -93,7 +98,7 @@ export class MatchService {
         ),
       );
 
-      const createdMatch: Match[] = [];
+      const createdMatch: MatchReturnType[] = [];
 
       for (const match of responses) {
         for (const game of match.response) {
@@ -115,7 +120,7 @@ export class MatchService {
           newMatch.awayTeam = awayTeam;
           const newMatchCreated = this.matchRepository.create(newMatch);
           const savedMatch = await this.matchRepository.save(newMatchCreated);
-          createdMatch.push(savedMatch);
+          createdMatch.push(this.makeMatchApiResponse(savedMatch));
         }
       }
 
@@ -234,5 +239,15 @@ export class MatchService {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  private makeMatchApiResponse(match: MatchType): MatchReturnType {
+    return {
+      ...match,
+      teams: {
+        home: match.homeTeam,
+        away: match.awayTeam,
+      },
+    };
   }
 }

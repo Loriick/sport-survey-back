@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { FeedbackService } from './feedback.service';
-import { Feedback as FeedbackType } from 'src/types/feedback';
-import { ErrorReturnType } from 'src/types/error';
+import { Feedback as FeedbackType } from '../types/feedback';
+import { ErrorReturnType } from '../types/error';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 
 @Controller()

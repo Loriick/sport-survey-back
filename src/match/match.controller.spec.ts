@@ -1,7 +1,15 @@
 import { TestingModule, Test } from '@nestjs/testing';
 import { MatchController } from './match.controller';
 import { MatchService } from './match.service';
-import { AllMatchPerSeason, League, Match } from '../../src/types/leagues';
+import {
+  AllMatchPerSeason,
+  League,
+  MatchReturnType,
+} from '../../src/types/leagues';
+import { Match, Team, Vote } from '../typeorm/entities';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { JwtAuthService } from '../auth/jwt/jwt.service';
+import { JwtService } from '@nestjs/jwt';
 
 const leagues: League[] = [
   {
@@ -15,7 +23,7 @@ const leagues: League[] = [
   },
 ];
 
-const matches: Match[] = [
+const matches: MatchReturnType[] = [
   {
     apiId: 1044885,
     date: '2023-08-11',
@@ -26,20 +34,19 @@ const matches: Match[] = [
     stadium: 'Allianz Riviera - Nice',
     teams: {
       home: {
-        id: 84,
+        providerId: 84,
         name: 'Nice',
         logo: 'https://media-3.api-sports.io/football/teams/84.png',
-        winner: null,
       },
       away: {
-        id: 79,
+        providerId: 79,
         name: 'Lille',
         logo: 'https://media-3.api-sports.io/football/teams/79.png',
-        winner: null,
       },
     },
   },
 ];
+
 const matchPerSeason: AllMatchPerSeason = {
   1: [
     {
@@ -52,16 +59,14 @@ const matchPerSeason: AllMatchPerSeason = {
       stadium: 'Allianz Riviera - Nice',
       teams: {
         home: {
-          id: 84,
+          providerId: 84,
           name: 'Nice',
           logo: 'https://media-3.api-sports.io/football/teams/84.png',
-          winner: null,
         },
         away: {
-          id: 79,
+          providerId: 79,
           name: 'Lille',
           logo: 'https://media-3.api-sports.io/football/teams/79.png',
-          winner: null,
         },
       },
     },
@@ -69,12 +74,47 @@ const matchPerSeason: AllMatchPerSeason = {
 };
 
 describe('AppController', () => {
-  let matchController;
-  let matchService;
+  let matchController: MatchController;
+  let matchService: MatchService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [MatchService],
+      providers: [
+        MatchService,
+        JwtAuthService,
+        {
+          provide: JwtService,
+          useValue: {
+            verify: jest.fn(),
+          },
+        },
+        {
+          provide: getRepositoryToken(Match),
+          useValue: {
+            create: jest.fn(),
+            save: jest.fn(),
+            find: jest.fn(),
+            findOneBy: jest.fn(),
+            findBy: jest.fn(),
+          },
+        },
+        {
+          provide: getRepositoryToken(Vote),
+          useValue: {
+            create: jest.fn(),
+            save: jest.fn(),
+            findOneBy: jest.fn(),
+          },
+        },
+        {
+          provide: getRepositoryToken(Team),
+          useValue: {
+            create: jest.fn(),
+            save: jest.fn(),
+            findBy: jest.fn(),
+          },
+        },
+      ],
       controllers: [MatchController],
     }).compile();
 
@@ -102,7 +142,7 @@ describe('AppController', () => {
       .spyOn(matchService, 'getTodayMatch')
       .mockImplementation(async () => matches);
 
-    expect(await matchController.getTodayMatch()).toEqual(matches);
+    expect(await matchController.getTodayMatch('2023-08-11')).toEqual(matches);
   });
 
   it('should return All games for the current season', async () => {

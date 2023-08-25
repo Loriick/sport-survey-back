@@ -7,8 +7,8 @@ import {
   Vote as VoteType,
 } from '../types/leagues';
 import { Vote } from '../typeorm/entities/MatchVote';
-import { JwtAuthGuard } from 'src/auth/jwt/jwt.gard';
-import { ErrorReturnType } from 'src/types/error';
+import { JwtAuthGuard } from '../auth/jwt/jwt.gard';
+import { ErrorReturnType } from '../types/error';
 
 @Controller('match')
 export class MatchController {

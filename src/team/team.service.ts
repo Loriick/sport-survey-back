@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Team } from 'src/typeorm/entities/Team';
+import { Team } from '../typeorm/entities/Team';
 
 @Injectable()
 export class TeamService {
