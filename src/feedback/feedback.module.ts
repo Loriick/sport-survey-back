@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { FeedbackController } from './feedback.controller';
-import { Feedback } from 'src/typeorm/entities';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FeedbackService } from './feedback.service';
+import { Feedback } from '../typeorm/entities';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Feedback])],

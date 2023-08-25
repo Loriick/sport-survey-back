@@ -29,8 +29,15 @@ export interface Match {
   vote?: any;
 }
 
+export interface MatchReturnType extends Omit<Match, 'homeTeam' | 'awayTeam'> {
+  teams: {
+    home: Team;
+    away: Team;
+  };
+}
+
 export interface AllMatchPerSeason {
-  [k: number]: Match[];
+  [k: number]: MatchReturnType[];
 }
 
 export interface Vote {

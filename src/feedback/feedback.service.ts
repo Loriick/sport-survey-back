@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Feedback } from 'src/typeorm/entities';
+import { Feedback } from '../typeorm/entities';
 import { Repository } from 'typeorm';
-import { Feedback as FeedbackType } from 'src/types/feedback';
-import { ErrorReturnType } from 'src/types/error';
+import { Feedback as FeedbackType } from '../types/feedback';
+import { ErrorReturnType } from '../types/error';
 import { Client } from '@notionhq/client';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 
