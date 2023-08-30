@@ -70,7 +70,7 @@ export class MatchService {
   }): Promise<MatchReturnType[] | ErrorReturnType> {
     try {
       const matchOfTheDay = await this.matchRepository.find({
-        relations: ['vote'],
+        relations: ['vote', 'team'],
         where: {
           date: Like(`%${date}%`),
           apiId: leagueId ? leagueId : undefined,
