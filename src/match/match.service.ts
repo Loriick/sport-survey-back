@@ -70,7 +70,7 @@ export class MatchService {
   }): Promise<MatchReturnType[] | ErrorReturnType> {
     try {
       const matchOfTheDay = await this.matchRepository.find({
-        relations: ['vote', 'team'],
+        relations: ['vote', 'homeTeam', 'awayTeam'],
         where: {
           date: Like(`%${date}%`),
           apiId: leagueId ? leagueId : undefined,
@@ -243,8 +243,10 @@ export class MatchService {
   }
 
   private makeMatchApiResponse(match: MatchType): MatchReturnType {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { awayTeam, homeTeam, ...rest } = match;
     return {
-      ...match,
+      ...rest,
       teams: {
         home: match.homeTeam,
         away: match.awayTeam,
