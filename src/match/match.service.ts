@@ -69,6 +69,7 @@ export class MatchService {
     leagueId,
   }): Promise<MatchReturnType[] | ErrorReturnType> {
     try {
+      console.log('PRODUCTION DATE', date);
       const matchOfTheDay = await this.matchRepository.find({
         relations: ['vote', 'homeTeam', 'awayTeam'],
         where: {
@@ -79,6 +80,13 @@ export class MatchService {
           timestamp: 'ASC',
         },
       });
+
+      console.log('MATCH OF THE DAY', matchOfTheDay);
+
+      console.log(
+        'IS THERE MATCH OF THE DAY IN THE DATABASE',
+        matchOfTheDay.length > 0,
+      );
       if (matchOfTheDay.length > 0)
         return matchOfTheDay.map((match) => this.makeMatchApiResponse(match));
 
