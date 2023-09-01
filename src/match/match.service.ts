@@ -13,7 +13,6 @@ import {
   countries,
   errorMessage,
   leagueList,
-  today,
 } from '../utils/constants';
 import { Repository } from 'typeorm';
 import { ErrorReturnType } from 'src/types/error';
@@ -58,6 +57,7 @@ export class MatchService {
 
       return leagues;
     } catch (error) {
+      console.error('THERE WAS A ERROR', error);
       return {
         message: errorMessage,
       };
@@ -90,6 +90,7 @@ export class MatchService {
       if (matchOfTheDay.length > 0)
         return matchOfTheDay.map((match) => this.makeMatchApiResponse(match));
 
+      console.log('START CREATE MATCH OF DAY LIST...');
       const leagues = await this.getLeagues();
       const leaguesIds = (leagues as League[]).map((league) => league.id);
 
@@ -98,7 +99,7 @@ export class MatchService {
           this.callFootballAPI({
             pathname: 'fixtures?',
             params: new URLSearchParams({
-              date: today,
+              date: date,
               league: id.toString(),
               season: new Date().getFullYear().toString(),
             }),
@@ -131,10 +132,10 @@ export class MatchService {
           createdMatch.push(this.makeMatchApiResponse(savedMatch));
         }
       }
-
+      console.log('MATCH LIST CREATED WITH ', createdMatch.length + ' CREATED');
       return createdMatch;
     } catch (error) {
-      console.log(error);
+      console.error('THERE WAS A ERROR', error);
       return {
         message: errorMessage,
       };
