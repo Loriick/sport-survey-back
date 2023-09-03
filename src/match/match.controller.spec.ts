@@ -45,11 +45,11 @@ const matches: MatchReturnType[] = [
         logo: 'https://media-3.api-sports.io/football/teams/79.png',
       },
     },
-    vote: [
-      { id: 1, gameId: 1, vote: 'Nice', userId: 1 },
-      { id: 3, gameId: 1, vote: 'Lille', userId: 3 },
-      { id: 4, gameId: 1, vote: 'Draw', userId: 4 },
-    ],
+    votes: {
+      nice: { count: 2, percentage: 33.33 },
+      lille: { count: 1, percentage: 33.33 },
+      draw: { count: 1, percentage: 33.33 },
+    },
   },
 ];
 

@@ -259,9 +259,10 @@ export class MatchService {
 
   private makeMatchApiResponse(match: MatchType): MatchReturnType {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { awayTeam, homeTeam, ...rest } = match;
+    const { awayTeam, homeTeam, vote, ...rest } = match;
     return {
       ...rest,
+      votes: this.getVoteResult(vote),
       teams: {
         home: match.homeTeam,
         away: match.awayTeam,

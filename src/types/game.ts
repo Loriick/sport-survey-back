@@ -26,11 +26,12 @@ export interface Match {
   day: number;
   homeTeam?: Team;
   awayTeam?: Team;
-
   vote?: Vote[];
 }
 
-export interface MatchReturnType extends Omit<Match, 'homeTeam' | 'awayTeam'> {
+export interface MatchReturnType
+  extends Omit<Match, 'homeTeam' | 'awayTeam' | 'vote'> {
+  votes?: Record<string, { count: number; percentage: number }>;
   teams: {
     home: Team;
     away: Team;
