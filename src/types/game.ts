@@ -27,8 +27,7 @@ export interface Match {
   homeTeam?: Team;
   awayTeam?: Team;
 
-  // TODO: change this type
-  vote?: any;
+  vote?: Vote[];
 }
 
 export interface MatchReturnType extends Omit<Match, 'homeTeam' | 'awayTeam'> {
@@ -43,19 +42,8 @@ export interface AllMatchPerSeason {
 }
 
 export interface Vote {
-  id: number;
-
+  id?: number;
   userId: number;
-
-  voteCount: number;
-
-  votes: {
-    away: number | null;
-    home: number | null;
-    draw: number | null;
-  };
-
+  vote: string;
   gameId: number;
-
-  match: Match;
 }
