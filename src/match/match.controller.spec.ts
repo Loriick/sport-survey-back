@@ -45,6 +45,11 @@ const matches: MatchReturnType[] = [
         logo: 'https://media-3.api-sports.io/football/teams/79.png',
       },
     },
+    vote: [
+      { id: 1, gameId: 1, vote: 'Nice', userId: 1 },
+      { id: 3, gameId: 1, vote: 'Lille', userId: 3 },
+      { id: 4, gameId: 1, vote: 'Draw', userId: 4 },
+    ],
   },
 ];
 
@@ -73,6 +78,12 @@ const matchPerSeason: AllMatchPerSeason = {
       },
     },
   ],
+};
+
+const voteResults = {
+  nice: { count: 2, percentage: 50 },
+  lille: { count: 1, percentage: 25 },
+  draw: { count: 1, percentage: 25 },
 };
 
 describe('AppController', () => {
@@ -153,5 +164,19 @@ describe('AppController', () => {
       .mockImplementation(async () => matchPerSeason);
 
     expect(await matchController.getAllMatch(61)).toEqual(matchPerSeason);
+  });
+
+  it('should return vote result', async () => {
+    jest
+      .spyOn(matchService, 'voteMatch')
+      .mockImplementation(async () => voteResults);
+
+    expect(
+      await matchController.voteMatch({
+        userId: 2,
+        gameId: 1,
+        vote: 'Nice',
+      }),
+    ).toEqual(voteResults);
   });
 });

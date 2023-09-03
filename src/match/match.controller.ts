@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { MatchService } from './match.service';
 import {
   AllMatchPerSeason,
@@ -6,8 +6,6 @@ import {
   Match,
   Vote as VoteType,
 } from '../types/game';
-import { Vote } from '../typeorm/entities/MatchVote';
-import { JwtAuthGuard } from '../auth/jwt/jwt.gard';
 import { ErrorReturnType } from '../types/error';
 
 @Controller('match')
@@ -35,8 +33,10 @@ export class MatchController {
   }
 
   @Post('vote')
-  @UseGuards(JwtAuthGuard)
-  async voteMatch(@Body() vote: Vote): Promise<VoteType | ErrorReturnType> {
+  // @UseGuards(JwtAuthGuard)
+  async voteMatch(
+    @Body() vote: VoteType,
+  ): Promise<Record<string, { count: number; percentage: number }>> {
     return await this.matchService.voteMatch(vote);
   }
 }

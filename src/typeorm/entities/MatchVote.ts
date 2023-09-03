@@ -9,15 +9,8 @@ export class Vote {
   @Column()
   userId: number;
 
-  @Column()
-  voteCount: number;
-
-  @Column('simple-json')
-  votes: {
-    away: number | null;
-    home: number | null;
-    draw: number | null;
-  };
+  @Column('varchar')
+  vote: string;
 
   @Column()
   gameId: number;

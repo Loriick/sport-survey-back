@@ -181,14 +181,20 @@ export class MatchService {
       await this.voteRepository.save(createdVote);
 
       const match = await this.matchRepository.findOneBy({ id: vote.gameId });
+
+      if (!match) {
+        throw new Error('Match not found');
+      }
+
       match.vote && match.vote?.length > 1
         ? match.vote.push(createdVote)
         : (match.vote = [createdVote]);
 
       await this.matchRepository.save(match);
 
-      return createdVote;
+      return this.getVoteResult(match.vote);
     } catch (error) {
+      console.error(error);
       return {
         message: errorMessage,
       };
@@ -261,5 +267,35 @@ export class MatchService {
         away: match.awayTeam,
       },
     };
+  }
+
+  async findMatchById(id: number): Promise<MatchType> {
+    try {
+      const match = await this.matchRepository.findOneBy({
+        id,
+      });
+      return match;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  getVoteResult(votes: MatchType['vote']) {
+    const totalCount = votes.length;
+    return votes.reduce((results, { vote }) => {
+      const cleanedVote = vote.toLowerCase();
+
+      results[cleanedVote] = results[cleanedVote] || {
+        count: 0,
+        percentage: 0,
+      };
+      results[cleanedVote].count++;
+      results[cleanedVote].percentage = (
+        (results[cleanedVote].count / totalCount) *
+        100
+      ).toFixed(2);
+
+      return results;
+    }, {});
   }
 }
