@@ -81,8 +81,6 @@ export class MatchService {
         },
       });
 
-      console.log('MATCH OF THE DAY', matchOfTheDay);
-
       console.log(
         'IS THERE MATCH OF THE DAY IN THE DATABASE',
         matchOfTheDay.length > 0,
@@ -107,9 +105,13 @@ export class MatchService {
         ),
       );
 
+      const cleanedResponse = responses.filter(
+        ({ response }) => response.length > 0,
+      );
+
       const createdMatch: MatchReturnType[] = [];
 
-      for (const match of responses) {
+      for (const match of cleanedResponse) {
         for (const game of match.response) {
           const { home, away } = game.teams;
           const homeTeam = await this.createTeam({
@@ -243,6 +245,10 @@ export class MatchService {
     }
   }
 
+  async getMatchDetail(matchId: string) {
+    return matchId;
+  }
+
   private async findTeam(providerId: number) {
     try {
       const team = await this.teamRepository.findBy({
@@ -282,8 +288,8 @@ export class MatchService {
   }
 
   getVoteResult(votes: MatchType['vote']) {
-    const totalCount = votes.length;
-    return votes.reduce((results, { vote }) => {
+    const totalCount = votes?.length;
+    return votes?.reduce((results, { vote }) => {
       const cleanedVote = vote.toLowerCase();
 
       results[cleanedVote] = results[cleanedVote] || {

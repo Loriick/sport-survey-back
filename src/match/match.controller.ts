@@ -39,4 +39,9 @@ export class MatchController {
   ): Promise<Record<string, { count: number; percentage: number }>> {
     return await this.matchService.voteMatch(vote);
   }
+
+  @Get('match/:matchId')
+  async getMatchDetail(@Param('matchId') matchId: string): Promise<any> {
+    return this.matchService.getMatchDetail(matchId);
+  }
 }
